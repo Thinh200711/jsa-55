@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tản nhiệt — MARC PC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="2" stroke="#FF7A33" stroke-width="2"/><path d="M9 2V6M19 2V6M9 22V26M19 22V26M2 9H6M2 19H6M22 9H26M22 19H26" stroke="#4FD8C4" stroke-width="1.5"/><rect x="9" y="9" width="10" height="10" fill="#FF7A33"/></svg>
+      </span>
+      MARC PC
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Trang chủ</a>
+      <a href="builder.html">Xây dựng PC</a>
+      <a href="prebuilt.html">PC dựng sẵn</a>
+      <a href="catalog.html">Linh kiện</a>
+    </div>
+    <div class="nav-right">
+      <div id="navAuth"></div>
+      <button class="cart-btn" onclick="toggleCart(true)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<section style="padding-top:48px;">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Tản nhiệt</h2>
+        <p>Tản nhiệt khí/AIO — giữ CPU luôn mát dưới ngưỡng TDP cho phép. Đang có <b class="mono" id="pageCount">0</b> sản phẩm.</p>
+      </div>
+    </div>
+    <div class="brand-filter" id="pageBrandFilter"></div>
+    <div class="part-list" id="pageList"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2026 MARC PC — Linh kiện máy tính &amp; PC theo yêu cầu.</span>
+    <span>Demo giao diện · Dữ liệu minh hoạ · Giá tham khảo VNĐ</span>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="overlay" id="overlay" onclick="closeAllOverlays()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <strong>Giỏ hàng</strong>
+    <button onclick="toggleCart(false)" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">×</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot">
+    <div class="summary-row"><span>Tổng cộng</span><b id="drawerTotal" class="mono">0đ</b></div>
+    <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="openCheckoutModal()">Tiến hành đặt hàng</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL (xem thông số 1 linh kiện) -->
+<div class="detail-modal" id="detailModal">
+  <div class="detail-box card" id="detailBox"></div>
+</div>
+
+<!-- CHECKOUT MODAL (Thông tin đặt hàng) -->
+<div class="detail-modal" id="checkoutModal">
+  <div class="detail-box card checkout-box" id="checkoutBox"></div>
+</div>
+
+<!-- AUTH MODAL (Đăng nhập / Đăng ký) -->
+<div class="detail-modal" id="authModal">
+  <div class="detail-box card auth-box" id="authBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Thứ tự nạp file quan trọng: data trước, rồi tới các file dùng chung,
+     cuối cùng mới tới script riêng của trang này (nằm ngay trong file) -->
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="detail.js"></script>
+<script>
+
+// ============================================================
+// Trang linh kiện độc lập: Tản nhiệt
+// Hiển thị toàn bộ sản phẩm trong PARTS['cooler'] (từ data.js),
+// lọc theo hãng, và cho phép xem chi tiết / thêm vào giỏ hàng.
+// ============================================================
+
+const PAGE_CAT = 'cooler';
+let pageBrand = 'all';
+
+function pageBrands(){
+  return [...new Set(PARTS[PAGE_CAT].map(p => p.brand))].sort();
+}
+
+function renderPageBrandFilter(){
+  const brands = pageBrands();
+  document.getElementById('pageBrandFilter').innerHTML = ['all', ...brands].map(b =>
+    `<button class="brand-chip ${pageBrand === b ? 'active' : ''}" onclick="setPageBrand('${b}')">${b === 'all' ? 'Tất cả hãng' : b}</button>`
+  ).join('');
+}
+function setPageBrand(b){
+  pageBrand = b;
+  renderPageList();
+  renderPageBrandFilter();
+}
+
+function renderPageList(){
+  const items = PARTS[PAGE_CAT].filter(p => pageBrand === 'all' || p.brand === pageBrand);
+  document.getElementById('pageCount').textContent = items.length;
+  document.getElementById('pageList').innerHTML = items.map(item => `
+    <div class="part-card card">
+      <button class="info-btn" onclick="event.stopPropagation(); openDetail('${PAGE_CAT}','${item.id}')" title="Xem chi tiết">i</button>
+      <div onclick="openDetail('${PAGE_CAT}','${item.id}')">
+        <div class="brand-tag">${item.brand}</div>
+        <h4>${item.name}</h4>
+        <div class="specs">${specChips(item, PAGE_CAT)}</div>
+        <div class="price">${fmt(item.price)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderPageBrandFilter();
+renderPageList();
+
+</script>
+<script src="chatbot.js"></script>
+</body>
+</html>

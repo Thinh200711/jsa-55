@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — MARC PC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============== CỔNG ĐĂNG NHẬP ADMIN ============== -->
+<div class="admin-gate" id="adminGate">
+  <div class="card admin-login-box">
+    <span class="logo-mark">
+      <svg viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="2" stroke="#FF7A33" stroke-width="2"/><path d="M9 2V6M19 2V6M9 22V26M19 22V26M2 9H6M2 19H6M22 9H26M22 19H26" stroke="#4FD8C4" stroke-width="1.5"/><rect x="9" y="9" width="10" height="10" fill="#FF7A33"/></svg>
+    </span>
+    <h2>MARC PC Admin</h2>
+    <p>Đăng nhập bằng tài khoản quản trị để truy cập hệ thống.</p>
+    <div class="auth-field"><label>Tên đăng nhập</label><input type="text" id="adminUser" name="admin_login_username" autocomplete="off" placeholder="admin" onkeydown="if(event.key==='Enter') submitAdminLogin();"></div>
+    <div class="auth-field"><label>Mật khẩu</label><input type="password" id="adminPass" name="admin_login_password" autocomplete="new-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') submitAdminLogin();"></div>
+    <div class="auth-error" id="adminLoginError"></div>
+    <button class="btn btn-primary" style="width:100%;" onclick="submitAdminLogin()">Đăng nhập quản trị</button>
+    <div class="admin-login-hint">Demo: tài khoản mặc định là <b class="mono">admin</b> / <b class="mono">admin123</b> — nên đổi mật khẩu sau khi đăng nhập lần đầu (mục Cài đặt).<br><br>Mẹo: bạn cũng có thể đăng nhập admin ngay từ nút "Đăng nhập" ở trang chủ (gõ tài khoản/mật khẩu admin vào đó) — hệ thống sẽ tự chuyển vào đây.</div>
+  </div>
+</div>
+
+<!-- ============== GIAO DIỆN QUẢN TRỊ ============== -->
+<div class="admin-shell" id="adminShell">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="2" stroke="#FF7A33" stroke-width="2"/><path d="M9 2V6M19 2V6M9 22V26M19 22V26M2 9H6M2 19H6M22 9H26M22 19H26" stroke="#4FD8C4" stroke-width="1.5"/><rect x="9" y="9" width="10" height="10" fill="#FF7A33"/></svg>
+      </span>
+      MARC PC Admin
+    </div>
+    <button class="admin-nav-btn active" data-page="overview" onclick="setAdminPage('overview')">📊 Tổng quan</button>
+    <button class="admin-nav-btn" data-page="orders" onclick="setAdminPage('orders')">📦 Đơn hàng</button>
+    <button class="admin-nav-btn" data-page="users" onclick="setAdminPage('users')">👤 Người dùng</button>
+    <button class="admin-nav-btn" data-page="parts" onclick="setAdminPage('parts')">🧩 Linh kiện</button>
+    <button class="admin-nav-btn" data-page="presets" onclick="setAdminPage('presets')">🖥️ Cấu hình dựng sẵn</button>
+    <button class="admin-nav-btn" data-page="discounts" onclick="setAdminPage('discounts')">🏷️ Mã giảm giá</button>
+    <button class="admin-nav-btn" data-page="settings" onclick="setAdminPage('settings')">⚙️ Cài đặt</button>
+    <div class="admin-sidebar-foot">
+      <button class="admin-nav-btn" onclick="doAdminLogout()">🚪 Đăng xuất</button>
+      <a href="index.html" class="admin-nav-btn" style="display:flex;">← Về trang chủ</a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- TỔNG QUAN -->
+    <section class="admin-page active" id="page-overview">
+      <div class="admin-page-head">
+        <div><h2>Tổng quan hệ thống</h2><p>Số liệu nhanh về cửa hàng, đơn hàng và danh mục linh kiện.</p></div>
+      </div>
+      <div class="admin-stats" id="ovStats"></div>
+      <h3 style="margin-bottom:12px;">Đơn hàng gần đây</h3>
+      <div id="ovRecentOrders"></div>
+    </section>
+
+    <!-- ĐƠN HÀNG -->
+    <section class="admin-page" id="page-orders">
+      <div class="admin-page-head">
+        <div><h2>Quản lý đơn hàng</h2><p>Xét duyệt và cập nhật tình trạng đơn hàng khách đã đặt.</p></div>
+      </div>
+      <div id="ordersTableWrap"></div>
+    </section>
+
+    <!-- NGƯỜI DÙNG -->
+    <section class="admin-page" id="page-users">
+      <div class="admin-page-head">
+        <div><h2>Quản lý người dùng</h2><p>Danh sách tài khoản khách hàng đã đăng ký trên hệ thống.</p></div>
+      </div>
+      <div id="usersTableWrap"></div>
+    </section>
+
+    <!-- LINH KIỆN -->
+    <section class="admin-page" id="page-parts">
+      <div class="admin-page-head">
+        <div><h2>Quản lý linh kiện</h2><p>Thêm chip CPU, mainboard, RAM... mới trực tiếp vào danh mục cửa hàng.</p></div>
+      </div>
+      <div class="admin-cat-tabs" id="catTabs"></div>
+      <div id="partFormArea"></div>
+      <div id="partsTableWrap"></div>
+    </section>
+
+    <!-- PRESET -->
+    <section class="admin-page" id="page-presets">
+      <div class="admin-page-head">
+        <div><h2>Cấu hình dựng sẵn (Preset)</h2><p>Tạo thêm các gói PC dựng sẵn để hiển thị ở trang "PC dựng sẵn".</p></div>
+      </div>
+      <div class="card admin-form-card">
+        <h3>+ Thêm cấu hình dựng sẵn mới</h3>
+        <p>Điền thông tin tổng quan, sau đó liệt kê từng linh kiện trong cấu hình bên dưới.</p>
+        <div class="admin-form-grid">
+          <div class="admin-field"><label>Phân khúc (tag)</label><input type="text" id="ps-tag" placeholder="VD: GAMING TẦM TRUNG"></div>
+          <div class="admin-field"><label>Tên cấu hình</label><input type="text" id="ps-name" placeholder="VD: MARC Gamer Pro II"></div>
+          <div class="admin-field"><label>Mục đích sử dụng</label><input type="text" id="ps-use" placeholder="VD: Game AAA 1440p, dựng phim nhẹ"></div>
+          <div class="admin-field"><label>Giá bán (VNĐ)</label><input type="number" id="ps-price" placeholder="VD: 29990000"></div>
+        </div>
+        <div class="admin-field" style="margin-top:14px;">
+          <label>Danh sách linh kiện trong cấu hình</label>
+          <div class="admin-specs-rows" id="psSpecsRows"></div>
+          <button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;width:fit-content;" onclick="addPresetSpecRow()">+ Thêm linh kiện</button>
+        </div>
+        <div class="admin-form-actions">
+          <button class="btn btn-primary" onclick="submitAddPreset()">Thêm cấu hình dựng sẵn</button>
+        </div>
+      </div>
+      <div id="presetsTableWrap"></div>
+    </section>
+
+    <!-- MÃ GIẢM GIÁ -->
+    <section class="admin-page" id="page-discounts">
+      <div class="admin-page-head">
+        <div><h2>Mã giảm giá</h2><p>Tạo mã khuyến mãi để khách áp dụng ở bước thanh toán.</p></div>
+      </div>
+      <div class="card admin-form-card">
+        <h3>+ Thêm mã giảm giá mới</h3>
+        <p>Mã sẽ tự động viết hoa và có hiệu lực ngay khi thêm.</p>
+        <div class="admin-form-grid">
+          <div class="admin-field"><label>Mã giảm giá</label><input type="text" id="dc-code" placeholder="VD: SALE20" style="text-transform:uppercase;"></div>
+          <div class="admin-field">
+            <label>Loại giảm giá</label>
+            <select id="dc-type">
+              <option value="percent">Phần trăm (%)</option>
+              <option value="fixed">Số tiền cố định (VNĐ)</option>
+            </select>
+          </div>
+          <div class="admin-field"><label>Giá trị</label><input type="number" id="dc-value" placeholder="VD: 20 (nếu %) hoặc 100000 (nếu VNĐ)"></div>
+          <div class="admin-field"><label>Mô tả hiển thị cho khách</label><input type="text" id="dc-label" placeholder="VD: Giảm 20% cho đơn từ 5 triệu"></div>
+        </div>
+        <div class="admin-form-actions">
+          <button class="btn btn-primary" onclick="submitAddDiscount()">Thêm mã giảm giá</button>
+        </div>
+      </div>
+      <div id="discountsTableWrap"></div>
+    </section>
+
+    <!-- CÀI ĐẶT -->
+    <section class="admin-page" id="page-settings">
+      <div class="admin-page-head">
+        <div><h2>Cài đặt tài khoản quản trị</h2><p>Đổi mật khẩu đăng nhập admin.</p></div>
+      </div>
+      <div class="card admin-form-card" style="max-width:420px;">
+        <h3>Đổi mật khẩu</h3>
+        <div class="admin-field" style="margin-bottom:14px;"><label>Mật khẩu hiện tại</label><input type="password" id="adminOldPass"></div>
+        <div class="admin-field" style="margin-bottom:14px;"><label>Mật khẩu mới</label><input type="password" id="adminNewPass"></div>
+        <div id="adminPassMsg" style="font-size:12.5px;margin-bottom:12px;min-height:16px;"></div>
+        <button class="btn btn-primary" onclick="submitChangeAdminPassword()">Cập nhật mật khẩu</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

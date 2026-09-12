@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARC PC — Build PC thật, giá thật</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="2" stroke="#FF7A33" stroke-width="2"/><path d="M9 2V6M19 2V6M9 22V26M19 22V26M2 9H6M2 19H6M22 9H26M22 19H26" stroke="#4FD8C4" stroke-width="1.5"/><rect x="9" y="9" width="10" height="10" fill="#FF7A33"/></svg>
+      </span>
+      MARC PC
+    </div>
+    <div class="nav-links">
+      <a href="builder.html">Xây dựng PC</a>
+      <a href="prebuilt.html">PC dựng sẵn</a>
+      <a href="catalog.html">Linh kiện</a>
+    </div>
+    <div class="nav-right">
+      <div id="navAuth"></div>
+      <button class="cart-btn" onclick="toggleCart(true)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Cấu hình thật · Giá thật · Tương thích được kiểm tra</div>
+      <h1>Build dàn PC <span>không đoán mò</span> linh kiện có hợp nhau không.</h1>
+      <p>MARC PC kiểm tra socket, RAM, công suất nguồn theo thời gian thực khi bạn chọn linh kiện — chọn tới đâu, biết ngay tới đó có hợp nhau hay không.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="builder.html">Bắt đầu build PC</a>
+        <a class="btn btn-ghost" href="prebuilt.html">Xem PC dựng sẵn</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b id="statParts">0</b><span>Linh kiện thật</span></div>
+        <div class="hero-stat"><b id="statBrands">0</b><span>Thương hiệu</span></div>
+        <div class="hero-stat"><b>100%</b><span>Kiểm tra tương thích</span></div>
+      </div>
+    </div>
+    <div class="hero-diagram card">
+      <div class="hero-diagram-label"><span><span class="dot"></span>SƠ ĐỒ TƯƠNG THÍCH (VÍ DỤ)</span><span>DEMO</span></div>
+      <div id="heroDiagram"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>3 bước để có dàn PC của riêng bạn</h2>
+        <p>Không cần rành kỹ thuật — hệ thống tự kiểm tra giúp bạn.</p>
+      </div>
+    </div>
+    <div class="pre-grid">
+      <div class="pre-card card">
+        <div class="pre-head">
+          <div class="tag">BƯỚC 1</div>
+          <h3>Chọn linh kiện</h3>
+          <div class="use">Vào trang Xây dựng PC, chọn từng món: CPU, mainboard, RAM, GPU...</div>
+        </div>
+      </div>
+      <div class="pre-card card">
+        <div class="pre-head">
+          <div class="tag">BƯỚC 2</div>
+          <h3>Kiểm tra tương thích</h3>
+          <div class="use">Trang tự động báo nếu socket, RAM, hay nguồn điện không hợp nhau.</div>
+        </div>
+      </div>
+      <div class="pre-card card">
+        <div class="pre-head">
+          <div class="tag">BƯỚC 3</div>
+          <h3>Thêm vào giỏ &amp; đặt hàng</h3>
+          <div class="use">Ưng ý rồi thì thêm vào giỏ hàng và tiến hành đặt hàng.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2026 MARC PC — Linh kiện máy tính &amp; PC theo yêu cầu.</span>
+    <span>Demo giao diện · Dữ liệu minh hoạ · Giá tham khảo VNĐ</span>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="overlay" id="overlay" onclick="closeAllOverlays()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <strong>Giỏ hàng</strong>
+    <button onclick="toggleCart(false)" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">×</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot">
+    <div class="summary-row"><span>Tổng cộng</span><b id="drawerTotal" class="mono">0đ</b></div>
+    <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="openCheckoutModal()">Tiến hành đặt hàng</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL (Thông tin đặt hàng) -->
+<div class="detail-modal" id="checkoutModal">
+  <div class="detail-box card checkout-box" id="checkoutBox"></div>
+</div>
+
+<!-- AUTH MODAL (Đăng nhập / Đăng ký) -->
+<div class="detail-modal" id="authModal">
+  <div class="detail-box card auth-box" id="authBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Thứ tự nạp file quan trọng: data trước, rồi tới các file dùng chung,
+     cuối cùng mới tới file riêng của trang này (home.js) -->
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="cart.js"></script>
+<script src="auth.js"></script>
+<script src="home.js"></script>
+<script src="chatbot.js"></script>
+</body>
+</html>
